@@ -1,4 +1,4 @@
-from LJ_phase_back import LJ
+from LJ_phase import LJ
 from numpy import exp
 
 nx = 4

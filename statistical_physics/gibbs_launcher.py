@@ -1,4 +1,4 @@
-from GIBBS_LOSI import *
+from gibbs import *
 
 n = 5
 density = 0.323

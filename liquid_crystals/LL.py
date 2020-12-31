@@ -160,7 +160,7 @@ def chain(temp, T, P, n, r, delta, nl, N):
 # Defining the main function
 
 def LL(temp=2.5, tempfin=.2, ntemp=20, nl=8, neval=10000):
-    nequil=30000
+    nequil=300
     N = nl**3
 
     # Creating the starting matrices with boundary conditions
@@ -244,3 +244,5 @@ def LL(temp=2.5, tempfin=.2, ntemp=20, nl=8, neval=10000):
           %((1./tempx[c+1]),(1./tempx[c-1])))
     print("--- %s seconds ---" % (time.time() - start_time))
     pt.show()
+
+LL(temp=2.5, tempfin=.2, ntemp=20, nl=8, neval=100)

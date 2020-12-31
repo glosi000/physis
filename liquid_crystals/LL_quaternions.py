@@ -120,7 +120,7 @@ def chain(temp, T, P, n, u0, r, delta, nl, N):
                  +dot(xo,x4)**2 +dot(xo,x5)**2 +dot(xo,x6)**2\
                  -dot(xn,x1)**2 -dot(xn,x2)**2 -dot(xn,x3)**2\
                  -dot(xn,x4)**2 -dot(xn,x5)**2 -dot(xn,x6)**2 
-	deltae *= 1.5
+        deltae *= 1.5
             
         if exp(-deltae/temp) >= csi[z] :
             T[k,i,j] = theta
@@ -145,7 +145,7 @@ def chain(temp, T, P, n, u0, r, delta, nl, N):
                 P[0, i, j] = phi
             u0 += deltae
             ac += 1.
-        if (z+1)%==0:
+        if (z+1) % 0: #It was %== before
             u.append(u0)
             if r == 1 :
                 q.append(par(T,P,nl,N))
@@ -239,3 +239,5 @@ def LL(temp=2.5, tempfin=.2, ntemp=30, nl=10, neval=1000000, nequil=3000000):
           "\n The transition temperature is in [%.3f,%.3f]"\
           %((1./tempx[c+1]),(1./tempx[c-1])))
     pt.show()
+
+LL(temp=2.5, tempfin=.2, ntemp=30, nl=10, neval=100, nequil=300)
