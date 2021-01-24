@@ -1,5 +1,6 @@
-from numpy import zeros, random, sort, sqrt, exp, log, rint, mean, pi
-from matplotlib.pyplot import plot, show, title, xlabel, ylabel, savefig, legend, xlim, ylim
+#from numpy import zeros, random, sort, sqrt, exp, log, rint, mean, pi
+import numpy as np
+import matplotlib.pypplot as plt
 from numba import jit
 import time
 
@@ -47,8 +48,8 @@ def init(n, density, T, Tfin, ntemp, delta, deltaV, nstep, nswap, nvol=1, sig=1.
 #create an fcc lattice 
 def create_fcc(a, n, L, eps, sig2, r2max):
     N = 4*n**3
-    x1 = zeros(N); y1 = zeros(N); z1 = zeros(N)
-    x2 = zeros(N); y2 = zeros(N); z2 = zeros(N)
+    x1 = np.zeros(N); y1 = np.zeros(N); z1 = np.zeros(N)
+    x2 = np.zeros(N); y2 = np.zeros(N); z2 = np.zeros(N)
     j  = 0 ; xi = 0. ; yi = 0. ; zi = 0. ; 
     for nx in range(n) :
         for ny in range(n) :
@@ -118,9 +119,9 @@ def minimum_distance(x1, y1, z1, x2, y2, z2, L, sig2, r2max):
     deltax = x2-x1
     deltay = y2-y1
     deltaz = z2-z1
-    min_deltax = deltax - L*rint(deltax/L)
-    min_deltay = deltay - L*rint(deltay/L)
-    min_deltaz = deltaz - L*rint(deltaz/L)
+    min_deltax = deltax - L*np.rint(deltax/L)
+    min_deltay = deltay - L*np.rint(deltay/L)
+    min_deltaz = deltaz - L*np.rint(deltaz/L)
     one_r2 = 1./(min_deltax**2 +min_deltay**2 + min_deltaz**2)
     #I ask to have distances lower than the cut off (3*sigma)
     rr = 1./r2max
@@ -140,9 +141,9 @@ def delta_energy(nt, x, y, z, N, L, eps, sig2, r2max):
 #    xpt = zeros(N-1) ; xpt[...] = x[nt]
 #    ypt = zeros(N-1) ; ypt[...] = y[nt]
 #    zpt = zeros(N-1) ; zpt[...] = z[nt]
-    xn = zeros(N-1) ; xn[:nt] = x[:nt] ; xn[nt:] = x[nt+1:]
-    yn = zeros(N-1) ; yn[:nt] = y[:nt] ; yn[nt:] = y[nt+1:]
-    zn = zeros(N-1) ; zn[:nt] = z[:nt] ; zn[nt:] = z[nt+1:]
+    xn = np.zeros(N-1) ; xn[:nt] = x[:nt] ; xn[nt:] = x[nt+1:]
+    yn = np.zeros(N-1) ; yn[:nt] = y[:nt] ; yn[nt:] = y[nt+1:]
+    zn = np.zeros(N-1) ; zn[:nt] = z[:nt] ; zn[nt:] = z[nt+1:]
     sig_r = minimum_distance(x[nt], y[nt], z[nt], xn, yn, zn, L, sig2, r2max)
     energy6, energy12 = LJ_energy(sig_r,eps)
     #In this way I found only the energy of the nt particle, looking at its
@@ -172,16 +173,16 @@ def displace(T, nt, x, y, z, N, L, en, en6, en12, eps, sig2, r2max, disp, ran):
         zt += L
 #    en6old, en12old = delta_energy(nt, x, y, z, N, L, eps, sig2, r2max)
 
-    xn = zeros(N-1) ; xn[:nt] = x[:nt] ; xn[nt:] = x[nt+1:]
-    yn = zeros(N-1) ; yn[:nt] = y[:nt] ; yn[nt:] = y[nt+1:]
-    zn = zeros(N-1) ; zn[:nt] = z[:nt] ; zn[nt:] = z[nt+1:]
+    xn = np.zeros(N-1) ; xn[:nt] = x[:nt] ; xn[nt:] = x[nt+1:]
+    yn = np.zeros(N-1) ; yn[:nt] = y[:nt] ; yn[nt:] = y[nt+1:]
+    zn = np.zeros(N-1) ; zn[:nt] = z[:nt] ; zn[nt:] = z[nt+1:]
 
     sig_r = minimum_distance(x[nt], y[nt], z[nt], xn, yn, zn, L, sig2, r2max)
     en6old, en12old = LJ_energy(sig_r,eps)
     en6old = sum(en6old) ; en12old = sum(en12old)
-#    xnew = zeros(N) ; xnew[...] = x ; xnew[nt] = xt
-#    ynew = zeros(N) ; ynew[...] = y ; ynew[nt] = yt
-#    znew = zeros(N) ; znew[...] = z ; znew[nt] = zt
+#    xnew = np.zeros(N) ; xnew[...] = x ; xnew[nt] = xt
+#    ynew = np.zeros(N) ; ynew[...] = y ; ynew[nt] = yt
+#    znew = np.zeros(N) ; znew[...] = z ; znew[nt] = zt
 #    en6new, en12new = delta_energy(nt, xt, yt, zt, N, L, eps, sig2, r2max)
     sig_r = minimum_distance(xt, yt, zt, xn, yn, zn, L, sig2, r2max)
     en6new, en12new = LJ_energy(sig_r,eps)
@@ -189,7 +190,7 @@ def displace(T, nt, x, y, z, N, L, en, en6, en12, eps, sig2, r2max, disp, ran):
     #displacement energy is given by the energy contribution changement of the 
     #particle nt, all the other particles remain as before
     DELTA = en12new + en6new - en6old - en12old
-    if ran < exp(-DELTA/T): 
+    if ran < np.exp(-DELTA/T): 
         #accept the move
         en6 += (en6new - en6old); en12 += (en12new - en12old)
         en += DELTA
@@ -210,7 +211,7 @@ def change_volume(T, deltaV, ran, Nadd, Ladd, Vadd, xadd, yadd, zadd, enadd, en6
     DELTA_add = enadd_new - enadd
     DELTA_sub = ensub_new - ensub
     
-    if ran < ((Vadd_new/Vadd)**Nadd)*((Vsub_new/Vsub)**Nsub)*exp(-(DELTA_add + DELTA_sub)/T) and Vsub_new>0.:
+    if ran < ((Vadd_new/Vadd)**Nadd)*((Vsub_new/Vsub)**Nsub)*np.exp(-(DELTA_add + DELTA_sub)/T) and Vsub_new>0.:
         en6add *= (Ladd / Ladd_new)**6. ; en12add *= (Ladd/ Ladd_new)**12.
         en6sub *= (Lsub / Lsub_new)**6. ; en12sub *= (Lsub/ Lsub_new)**12.        
         xadd *= (Ladd_new / Ladd) ; yadd *= (Ladd_new / Ladd) ; zadd *= (Ladd_new / Ladd)
@@ -225,16 +226,16 @@ def change_volume(T, deltaV, ran, Nadd, Ladd, Vadd, xadd, yadd, zadd, enadd, en6
 def swap_particle(T, nt, ran, Nout, Lout, Vout, xout, yout, zout, enout, en6out, en12out,
                   Nin, Lin, Vin, xin, yin, zin, enin, en6in, en12in, eps, sig2, r2out, r2in):
 #    delta6out, delta12out = delta_energy(nt, xout, yout, zout, Nout, Lout, eps, sig2, r2out)
-    xn = zeros(Nout-1) ; xn[:nt] = xout[:nt] ; xn[nt:] = xout[nt+1:]
-    yn = zeros(Nout-1) ; yn[:nt] = yout[:nt] ; yn[nt:] = yout[nt+1:]
-    zn = zeros(Nout-1) ; zn[:nt] = zout[:nt] ; zn[nt:] = zout[nt+1:]
+    xn = np.zeros(Nout-1) ; xn[:nt] = xout[:nt] ; xn[nt:] = xout[nt+1:]
+    yn = np.zeros(Nout-1) ; yn[:nt] = yout[:nt] ; yn[nt:] = yout[nt+1:]
+    zn = np.zeros(Nout-1) ; zn[:nt] = zout[:nt] ; zn[nt:] = zout[nt+1:]
     sig_r = minimum_distance(xout[nt], yout[nt], zout[nt], xn, yn, zn, Lout, sig2, r2out)
     delta6out, delta12out = LJ_energy(sig_r,eps)
     delta6out = sum(delta6out) ; delta12out = sum(delta12out)
     #I'm taking away the particle nt. The energy box varies of -(energy of nt particle)
     DELTA_out = -(delta6out + delta12out)
     #Extract randomly the particle position in the *in box
-    xt, yt, zt = random.uniform(-Lin/2.,Lin/2., 3)
+    xt, yt, zt = np.random.uniform(-Lin/2.,Lin/2., 3)
 #    xpt = zeros(Nin) ; xpt[...] = xt
 #    ypt = zeros(Nin) ; ypt[...] = yt
 #    zpt = zeros(Nin) ; zpt[...] = zt
@@ -244,10 +245,10 @@ def swap_particle(T, nt, ran, Nout, Lout, Vout, xout, yout, zout, enout, en6out,
     delta6in = sum(delta6in) ; delta12in = sum(delta12in)
     #The energy of the particle nt will be added to the *in box energy if the move is accepted
     DELTA_in = delta6in + delta12in
-    if ran < (Vin/(Nin+1))*(Nout/Vout)*exp(-(DELTA_in + DELTA_out)/T):
-        xni = zeros(Nin+1) ; xni[:Nin] = xin[...] ; xni[Nin] = xt
-        yni = zeros(Nin+1) ; yni[:Nin] = yin[...] ; yni[Nin] = yt
-        zni = zeros(Nin+1) ; zni[:Nin] = zin[...] ; zni[Nin] = zt
+    if ran < (Vin/(Nin+1))*(Nout/Vout)*np.exp(-(DELTA_in + DELTA_out)/T):
+        xni = np.zeros(Nin+1) ; xni[:Nin] = xin[...] ; xni[Nin] = xt
+        yni = np.zeros(Nin+1) ; yni[:Nin] = yin[...] ; yni[Nin] = yt
+        zni = np.zeros(Nin+1) ; zni[:Nin] = zin[...] ; zni[Nin] = zt
 #        xout = delete(xout, nt) ; yout = delete(yout, nt) ; zout = delete(zout, nt)
         en6out -= delta6out ; en12out -= delta12out ; enout += DELTA_out
         en6in += delta6in ; en12in += delta12in ; enin += DELTA_in
@@ -260,9 +261,9 @@ def swap_particle(T, nt, ran, Nout, Lout, Vout, xout, yout, zout, enout, en6out,
 #calculate the chemical potential using the particle addition techique
 def chem_pot(x, y, z, N, L, eps, sig2, r2max):
     ll = L/2.
-    xt = random.uniform(-ll,ll)
-    yt = random.uniform(-ll,ll)
-    zt = random.uniform(-ll,ll)
+    xt = np.random.uniform(-ll,ll)
+    yt = np.random.uniform(-ll,ll)
+    zt = np.random.uniform(-ll,ll)
 #    xpt = zeros(N) ; xpt[...] = xt
 #    ypt = zeros(N) ; ypt[...] = yt
 #    zpt = zeros(N) ; zpt[...] = zt
@@ -276,9 +277,9 @@ def chem_pot(x, y, z, N, L, eps, sig2, r2max):
 @jit(nopython=True,cache=True,nogil=True)
 def countg(N, x, y, z, gcount, L, ldel, kg, sig2, r2max):
     RMAX = (L/2.)**2
-    xpt = zeros(N)
-    ypt = zeros(N)
-    zpt = zeros(N)
+    xpt = np.zeros(N)
+    ypt = np.zeros(N)
+    zpt = np.zeros(N)
     for k in range(N-1):
         j=k+1
         xpt[...] = x[k]
@@ -287,12 +288,12 @@ def countg(N, x, y, z, gcount, L, ldel, kg, sig2, r2max):
         deltax = x[j:]-xpt[j:]
         deltay = y[j:]-ypt[j:]
         deltaz = z[j:]-zpt[j:]
-        min_deltax = deltax - L*rint(deltax/L)
-        min_deltay = deltay - L*rint(deltay/L)
-        min_deltaz = deltaz - L*rint(deltaz/L)
+        min_deltax = deltax - L*np.rint(deltax/L)
+        min_deltay = deltay - L*np.rint(deltay/L)
+        min_deltaz = deltaz - L*np.rint(deltaz/L)
         r2 = (min_deltax**2 +min_deltay**2 + min_deltaz**2)
         b = r2 < RMAX
-        lm  = sqrt(r2[b])
+        lm  = np.sqrt(r2[b])
         for elm in lm :
             gcount[int(elm/ldel)]+=2.
     return gcount
@@ -302,20 +303,20 @@ def countg(N, x, y, z, gcount, L, ldel, kg, sig2, r2max):
 def radialdistr(T, nth, x, y, z, en, en6, en12, N, L, delta, eps, sig2, r2max):    
     ldel=0.01; kg=int(L/ldel)+1
     inter = 100
-    gcount = zeros(kg)
-    ran_acc = random.random(nth)
-    ran_disp = delta*(1.-2.*random.random(size=(3,nth)))
-    nt = random.randint(0, N, size=nth)
+    gcount = np.zeros(kg)
+    ran_acc = np.random.random(nth)
+    ran_disp = delta*(1.-2.*np.random.random(size=(3,nth)))
+    nt = np.random.randint(0, N, size=nth)
     for i in range(nth):
         acc, x, y, z, en, en6, en12 = displace(T, nt[i], x, y, z, N, L, en, en6, en12, eps, sig2, r2max, ran_disp[:,i], ran_acc[i])
         if i%inter == 0:        
             gcount = countg(N, x, y, z, gcount, L, ldel, kg, sig2, r2max)
-    V = zeros(kg)
-    r = zeros(kg)
-    g = zeros(kg)
+    V = np.zeros(kg)
+    r = np.zeros(kg)
+    g = np.zeros(kg)
     rho = N/(L**3)
     for lm in range(kg) :
-          V[lm] = 4./3.*pi*(ldel**3)*(3*lm*lm +3*lm + 1); 
+          V[lm] = 4./3.*np.pi*(ldel**3)*(3*lm*lm +3*lm + 1); 
           g[lm] = gcount[lm]/(V[lm]*(N -1)*T*rho);
           r[lm] = (lm+0.5)*ldel
     return r[:int(kg/2)], g[:int(kg/2)]#/(int(nth/inter))
@@ -326,53 +327,53 @@ def save_and_plot(result, T, ntot, nvar, pres, energy1, density1, mu1, pressure1
     
     nmes = int(ntot/(2*nvar))
     nhalf = int(ntot/2)
-    m1 = mean(mu1) ; m2 = mean(mu2)
+    m1 = np.mean(mu1) ; m2 = np.mean(mu2)
     errm1 = mu1.std(ddof=1) ; errm2 = mu2.std(ddof=1)
-    p1 = mean(pressure1[nhalf:]) ; p2 = mean(pressure2[nhalf:])
+    p1 = np.mean(pressure1[nhalf:]) ; p2 = np.mean(pressure2[nhalf:])
     errp1 = pressure1[nhalf:].std(ddof=1) ; errp2 = pressure2[nhalf:].std(ddof=1)
-    men1 = mean(energy1[nhalf:]) ; men2 = mean(energy2[nhalf:])
+    men1 = np.mean(energy1[nhalf:]) ; men2 = np.mean(energy2[nhalf:])
     errmen1 = energy1[nhalf:].std(ddof=1); errmen2 = energy2[nhalf:].std(ddof=1);
-    mden1 = mean(density1[nhalf:]); mden2 = mean(density2[nhalf:])
+    mden1 = np.mean(density1[nhalf:]); mden2 = np.mean(density2[nhalf:])
     errden1 = density1[nhalf:].std(ddof=1); errden2 = density2[nhalf:].std(ddof=1);
           
     
-    plot(x1,y1,'ro') ; title("gas xy-plane"); savefig("box1_xy_T=%.2f.png"%T); show()
-    plot(x2,y2,'bo') ; title("liquid 2 xy-plane"); savefig("box2_xy_T=%.2f.png"%T); show()
+    plt.plot(x1,y1,'ro') ; plt.title("gas xy-plane"); plt.savefig("box1_xy_T=%.2f.png"%T); plt.show()
+    plt.plot(x2,y2,'bo') ; plt.title("liquid 2 xy-plane"); plt.savefig("box2_xy_T=%.2f.png"%T); plt.show()
     
-    plot(range(ntot), energy1, 'r', label='gas')
-    plot(range(ntot), energy2, 'b', label='liquid')
-    xlabel("n. step"); ylabel("energy"); title("Energies"); legend(loc='upper left');
-    savefig("energies_T=%.2f.png"%T); show()
+    plt.plot(range(ntot), energy1, 'r', label='gas')
+    plt.plot(range(ntot), energy2, 'b', label='liquid')
+    plt.xlabel("n. step"); plt.ylabel("energy"); plt.title("Energies"); plt.legend(loc='upper left');
+    plt.savefig("energies_T=%.2f.png"%T); plt.show()
     
-    plot(range(ntot), density1, 'r', label='gas')
-    plot(range(ntot), density2, 'b', label='liquid')
-    xlabel("n. step"); ylabel("density"); title("Densities"); legend(loc='upper left');
-    savefig("densities_T=%.2f.png"%T); show()
+    plt.plot(range(ntot), density1, 'r', label='gas')
+    plt.plot(range(ntot), density2, 'b', label='liquid')
+    plt.xlabel("n. step"); plt.ylabel("density"); plt.title("Densities"); plt.legend(loc='upper left');
+    plt.savefig("densities_T=%.2f.png"%T); plt.show()
     
-    plot(range(nmes-1), mu1, 'r', label='gas')
-    plot(range(nmes-1), mu2, 'b', label='liquid')
-    xlabel("n. step"); ylabel("chem. pot."); title("Chemical Potentials"); legend(loc='upper left');
-    savefig("chempot_T=%.2f.png"%T); show()
+    plt.plot(range(nmes-1), mu1, 'r', label='gas')
+    plt.plot(range(nmes-1), mu2, 'b', label='liquid')
+    plt.xlabel("n. step"); plt.ylabel("chem. pot."); plt.title("Chemical Potentials"); plt.legend(loc='upper left');
+    plt.savefig("chempot_T=%.2f.png"%T); plt.show()
     
-    plot(range(ntot), pressure1, 'r', label='gas')
-    plot(range(ntot), pressure2, 'b', label='liquid')
-    xlabel("n. step"); ylabel("pressure"); title("Pressures"); legend(loc='upper left');
-    savefig("pressure_T=%.2f.png"%T); show()
+    plt.plot(range(ntot), pressure1, 'r', label='gas')
+    plt.plot(range(ntot), pressure2, 'b', label='liquid')
+    plt.xlabel("n. step"); plt.ylabel("pressure"); plt.title("Pressures"); plt.legend(loc='upper left');
+    plt.savefig("pressure_T=%.2f.png"%T); plt.show()
     
-    plot(r1, g1, 'r')
-    xlabel("r/sig"); ylabel("g(r)"); title("Radial distr. gas");
-    savefig("g1_T=%.2f.png"%T); show()
+    plt.plot(r1, g1, 'r')
+    plt.xlabel("r/sig"); plt.ylabel("g(r)"); plt.title("Radial distr. gas");
+    plt.savefig("g1_T=%.2f.png"%T); plt.show()
     
-    plot(r2, g2, 'b')
-    xlabel("r/sig"); ylabel("g(r)"); title("Radial distr. liquid");
-    savefig("g2_T=%.2f.png"%T); show()
+    plt.plot(r2, g2, 'b')
+    plt.xlabel("r/sig"); plt.ylabel("g(r)"); plt.title("Radial distr. liquid");
+    plt.savefig("g2_T=%.2f.png"%T); plt.show()
     
-    plot(hist_x,hist1_y,'r') ; plot(hist_x,hist2_y,'b')
-    title("density distribution"); savefig("den_dist_T=%.2f.png"%T); show()
+    plt.plot(hist_x,hist1_y,'r') ; plt.plot(hist_x,hist2_y,'b')
+    plt.title("density distribution"); plt.savefig("den_dist_T=%.2f.png"%T); plt.show()
     
-    plot(x_plot, y_plot,'oy'); plot((1.-x_plot), (1.-y_plot),'og')
-    xlim([0.,1.]); ylim([0.,1.]); xlabel("x=N1/N"); ylabel("y=V1/V"); 
-    savefig("xy_plot_T=%.2f.png"%T); show()
+    plt.plot(x_plot, y_plot,'oy'); plt.plot((1.-x_plot), (1.-y_plot),'og')
+    plt.xlim([0.,1.]); plt.ylim([0.,1.]); plt.xlabel("x=N1/N"); plt.ylabel("y=V1/V"); 
+    plt.savefig("xy_plot_T=%.2f.png"%T); plt.show()
     
     print("Densities: %.3f +- %.3f   %.3f +- %.3f"%(mden1,errden1,mden2,errden2))
     print("\nMean Energies: \n", men1, " +- ", errmen1, "\n", men2, " +- ", errmen2)
@@ -440,10 +441,10 @@ def save_and_plot(result, T, ntot, nvar, pres, energy1, density1, mu1, pressure1
     result.write("# Densities: %.3f+-%.3f   %.3f+-%.3f\n#\n"%(mden1,errden1, mden2, errden2))
     result.write("# Chemical Potentials: %.3f+-%.3f   %.3f+-%.3f\n# Mean: %.3f\n#\n"%(m1, errm1, m2, errm2, (m1+m2)/2.))
     result.write("# Pressures: %.3f+-%.3f   %.3f+-%.3f\n# Mean: %.3f\n#\n"%(p1, errp1, p2, errp2, (p1+p2)/2.)) 
-    result.write("# Energy correlation %.3f"%(mean((energy1[nhalf:]-men1)*(energy2[nhalf:]-men2))/errmen1/errmen2))
-    result.write("\n# Density correlation %.3f"%(mean((density1[nhalf:]-mden1)*(density2[nhalf:]-mden2))/errden1/errden2))
-    result.write("\n# Chem. pot. correlation %.3f"%(mean((mu1-m1)*(mu2-m2))/errm1/errm2))
-    result.write("\n# Pressure correlation %.3f"%(mean((pressure1[nhalf:]-p1)*(pressure2[nhalf:]-p2))/errp1/errp2))
+    result.write("# Energy correlation %.3f"%(np.mean((energy1[nhalf:]-men1)*(energy2[nhalf:]-men2))/errmen1/errmen2))
+    result.write("\n# Density correlation %.3f"%(np.mean((density1[nhalf:]-mden1)*(density2[nhalf:]-mden2))/errden1/errden2))
+    result.write("\n# Chem. pot. correlation %.3f"%(np.mean((mu1-m1)*(mu2-m2))/errm1/errm2))
+    result.write("\n# Pressure correlation %.3f"%(np.mean((pressure1[nhalf:]-p1)*(pressure2[nhalf:]-p2))/errp1/errp2))
     result.write("\n#\n")
                  
     return result
@@ -461,56 +462,59 @@ def metropolis(T, nstep, x1, y1, z1, x2, y2, z2, N1, N2, L1, L2, en1, en6_1,
     nhalf = int(ntot/2)
     nmes = int(ntot/(2*nvar))
     
-    pres_ratio = zeros(6) ; acc_ratio = zeros(6)
+    pres_ratio = np.zeros(6)
+    acc_ratio = np.zeros(6)
     
-    energy1 = zeros(ntot)
-    density1 = zeros(ntot)
-    energy2 = zeros(ntot)
-    density2 = zeros(ntot)
+    energy1 = np.zeros(ntot)
+    density1 = np.zeros(ntot)
+    energy2 = np.zeros(ntot)
+    density2 = np.zeros(ntot)
     
-    pressure1 = zeros(ntot)
-    pressure2 = zeros(ntot)
+    pressure1 = np.zeros(ntot)
+    pressure2 = np.zeros(ntot)
     
-    den_mu1 = zeros(nvar)
-    den_mu2 = zeros(nvar)
-    delta_mu1 = zeros(nvar)
-    delta_mu2 = zeros(nvar)    
-    vol_plot = zeros(nvar)
-    num_plot = zeros(nvar)    
+    den_mu1 = np.zeros(nvar)
+    den_mu2 = np.zeros(nvar)
+    delta_mu1 = np.zeros(nvar)
+    delta_mu2 = np.zeros(nvar)    
+    vol_plot = np.zeros(nvar)
+    num_plot = np.zeros(nvar)    
     
-    mu1 = zeros(nmes)
-    mu2 = zeros(nmes)
-    x_plot = zeros(nmes)
-    y_plot = zeros(nmes)
+    mu1 = np.zeros(nmes)
+    mu2 = np.zeros(nmes)
+    x_plot = np.zeros(nmes)
+    y_plot = np.zeros(nmes)
 
     k = 0 ; m = 0 ; q = 0 ; acc = 0 
 #    nt1 = random.randint(0,N1,size=ntot)
 #    nt2 = random.randint(0,N2,size=ntot)
-    ran_choice = random.uniform(0.,1.,ntot)
-    ran_acc = random.uniform(0.,1.,ntot)
-    ran_disp = delta*(1-2*random.uniform(0.,1.,size=(3,ntot)))
-    ran_vol = deltaV*random.uniform(0.,1.,size=ntot)
-    ran_vol_ext = random.random(ntot)
+    ran_choice = np.random.uniform(0.,1.,ntot)
+    ran_acc = np.random.uniform(0.,1.,ntot)
+    ran_disp = delta * (1 - 2 * np.random.uniform(0., 1., size=(3, ntot)))
+    ran_vol = deltaV * np.random.uniform(0., 1., size=ntot)
+    ran_vol_ext = np.random.random(ntot)
     
     r1 = N1/nvar
     r2 = N/nvar
     r3 = (N+nvol)/nvar
     r4 = (N+nvol+ 0.5*nswap)/nvar
     
-    vol1 = zeros(ntot); vol2 = zeros(ntot)
-    num1 = zeros(ntot); num2 = zeros(ntot)
+    vol1 = np.zeros(ntot)
+    vol2 = np.zeros(ntot)
+    num1 = np.zeros(ntot)
+    num2 = np.zeros(ntot)
     
     for j in range(nstep):
         for i in range(nvar):
             if ran_choice[k] < r1 and N1>0: #displace randomly a particle in box-1
-                nt = random.randint(0, N1)                
+                nt = np.random.randint(0, N1)                
                 pres_ratio[0] += 1
                 acc, x1, y1, z1, en1, en6_1, en12_1 = displace(T, nt, x1, y1, z1, N1, L1,
                                                  en1, en6_1, en12_1, eps, sig2,
                                                  r2max1, ran_disp[:,k], ran_acc[k])
                 acc_ratio[0] += acc
             elif ran_choice[k] < r2 and N2>0:#displace randomly a particle in box-2
-                nt = random.randint(0,N2)                
+                nt = np.random.randint(0,N2)                
                 pres_ratio[1] += 1
                 acc, x2, y2, z2, en2, en6_2, en12_2 = displace(T, nt, x2, y2, z2, N2, L2,
 		                                                  en2, en6_2, en12_2, eps, sig2,
@@ -529,7 +533,7 @@ def metropolis(T, nstep, x1, y1, z1, x2, y2, z2, N1, N2, L1, L2, en1, en6_1,
 
             elif ran_choice[k] < r4 and N2>0: #swap a particle from 2 to 1
                 #I cannot have an empty box otherwise when recalculating nt2 I get error
-                nt = random.randint(0, N2)                
+                nt = np.random.randint(0, N2)                
                 pres_ratio[4] += 1
                 acc, x2, y2, z2, en2, en6_2, en12_2, x1, y1, z1, en1, en6_1, en12_1 = swap_particle(T, nt, ran_acc[k],
                 N2, L2, V2, x2, y2, z2, en2, en6_2, en12_2, N1, L1, V1, x1, y1, z1, en1, en6_1, en12_1,eps, sig2, r2max2, r2max1)                    
@@ -541,7 +545,7 @@ def metropolis(T, nstep, x1, y1, z1, x2, y2, z2, N1, N2, L1, L2, en1, en6_1,
                     
             elif N1>0: #swap a particle from 1 to 2
                 #I cannot have an empty box otherwise when recalculating nt1 I get error
-                nt = random.randint(0,N1)                
+                nt = np.random.randint(0,N1)                
                 pres_ratio[5] += 1
                 acc, x1, y1, z1, en1, en6_1, en12_1, x2, y2, z2, en2, en6_2, en12_2 = swap_particle(T, nt, ran_acc[k],
                 N1, L1, V1, x1, y1, z1, en1, en6_1, en12_1, N2, L2, V2, x2, y2, z2, en2, en6_2, en12_2,eps, sig2, r2max1, r2max2)    
@@ -570,10 +574,10 @@ def metropolis(T, nstep, x1, y1, z1, x2, y2, z2, N1, N2, L1, L2, en1, en6_1,
                 m += 1
             k +=1
         if k > nhalf:
-            mu1[q] = T*(log(mean(den_mu1)/mean(exp(-delta_mu1/T))))
-            mu2[q] = T*(log(mean(den_mu2)/mean(exp(-delta_mu2/T))))
-            x_plot[q] = mean(num_plot)
-            y_plot[q] = mean(vol_plot)
+            mu1[q] = T*(np.log(np.mean(den_mu1) / np.mean(np.exp(-delta_mu1/T))))
+            mu2[q] = T*(np.log(np.mean(den_mu2) / np.mean(np.exp(-delta_mu2/T))))
+            x_plot[q] = np.mean(num_plot)
+            y_plot[q] = np.mean(vol_plot)
             q += 1
             m = 0
             
@@ -605,10 +609,14 @@ def metropolis(T, nstep, x1, y1, z1, x2, y2, z2, N1, N2, L1, L2, en1, en6_1,
         print('out of the box') 
     
     x_plot /= N ; y_plot /= V    
-    hist1_y = zeros(ld) ; hist2_y = zeros(ld) ; hist_x = zeros(ld)
+    hist1_y = np.zeros(ld)
+    hist2_y = np.zeros(ld)
+    hist_x = np.zeros(ld)
+
     for i in range(ld):
         hist_x[i] = i/ld
-    den1 = sort(density1[nhalf:]) ; den2 = sort(density2[nhalf:])
+    den1 = np.sort(density1[nhalf:])
+    den2 = np.sort(density2[nhalf:])
     j = 0
     for i in range(ld):
         while den1[j] < hist_x[i] and j < nhalf-1:
@@ -630,15 +638,42 @@ def metropolis(T, nstep, x1, y1, z1, x2, y2, z2, N1, N2, L1, L2, en1, en6_1,
         r1 = 0; r2 = 0; g1 = 0; g2 = 0
     
     #now save all the data. I save gas and liquid phases with red, blue colors
-    if mean(density1[nhalf:]) <= mean(density2[nhalf:]):
-        plot(num1,'r');plot(num2,'b');xlabel("step"); ylabel("n.part.");title("Particles"); savefig("number_T=%.2f.png"%T);show()
-        plot(vol1,'r');plot(vol2,'b');xlabel("step"); ylabel("volume");title("Volume"); savefig("volume_T=%.2f.png"%T);show()         
+    if np.mean(density1[nhalf:]) <= np.mean(density2[nhalf:]):
+        plt.plot(num1,'r')
+        plt.plot(num2,'b')
+        plt.xlabel("step")
+        plt.ylabel("n.part.")
+        plt.title("Particles")
+        plt.savefig("number_T=%.2f.png"%T)
+        plt.show()
+        
+        plt.plot(vol1,'r')
+        plt.plot(vol2,'b')
+        plt.xlabel("step")
+        plt.ylabel("volume")
+        plt.title("Volume")
+        plt.savefig("volume_T=%.2f.png"%T)
+        plt.show()
+         
         pres = (pres[0], acc[0], pres[1], acc[1], pres[2], acc[2], 
                 pres[3], acc[3], pres[4], acc[4], pres[5], acc[5])
         result=save_and_plot(result, T, ntot, nvar, pres, energy1, density1, mu1[1:], pressure1, r1, g1, energy2, density2, mu2[1:], pressure2, r2, g2, x_plot, y_plot, N1, L1, x1, y1, z1, en1, en6_1, en12_1, N2, x2, y2, z2, L2, en2, en6_2, en12_2, hist_x, hist1_y, hist2_y)    
     else:
-        plot(num1,'b');plot(num2,'r');xlabel("step"); ylabel("n-part-");title("Particles"); savefig("number_T=%.2f.png"%T);show()
-        plot(vol1,'b');plot(vol2,'r');xlabel("step"); ylabel("volume");title("Volume"); savefig("volume_T=%.2f.png"%T);show()
+        plt.plot(num1,'b')
+        plt.plot(num2,'r')
+        plt.xlabel("step")
+        plt.ylabel("n-part-")
+        plt.title("Particles")
+        plt.savefig("number_T=%.2f.png"%T)
+        plt.show()
+        
+        plt.plot(vol1,'b')
+        plt.plot(vol2,'r')
+        plt.xlabel("step")
+        plt.ylabel("volume")
+        plt.title("Volume")
+        plt.savefig("volume_T=%.2f.png"%T)
+        plt.show()
 
         pres = (pres[1], acc[1], pres[0], acc[0], pres[3], acc[3], 
                 pres[2], acc[2], pres[5], acc[5], pres[4], acc[4])

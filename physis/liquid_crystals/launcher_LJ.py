@@ -1,5 +1,5 @@
 from LJ_phase import LJ
-from numpy import exp
+import numpy as np
 
 nx = 4
 ny = 4
@@ -13,7 +13,9 @@ mu = 9.98
 
 system =  LJ(nx, ny, nz, density, radius, epsilon)
 system.create_fcc_lattice()
-energy, acc, acc_add, acc_rej = system.metropolis(T, zeta=exp(mu/T), nstep=60000)
+energy, acc, acc_add, acc_rej = system.metropolis(T, 
+                                                  zeta = np.exp(mu/T), 
+                                                  nstep = 60000)
 print("acceptance rate",acc)
 print("adding acc",acc_add)
 print("rejecting acc",acc_rej)

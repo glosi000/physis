@@ -1,4 +1,4 @@
-from gibbs import *
+from gibbs import init
 
 n = 5
 density = 0.323
