@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import numpy as np
 
 #These are all the values of rho, energy, pressure and chemical pot. for the 

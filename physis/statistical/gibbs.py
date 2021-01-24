@@ -1,4 +1,6 @@
-#from numpy import zeros, random, sort, sqrt, exp, log, rint, mean, pi
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import numpy as np
 import matplotlib.pypplot as plt
 from numba import jit

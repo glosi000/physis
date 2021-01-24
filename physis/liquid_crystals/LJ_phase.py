@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 class LJ:
     
     def __init__(self, nx, ny, nz, density, radius = .5, epsilon = 1. ):

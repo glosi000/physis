@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from LJ_phase import LJ
 import numpy as np
 
