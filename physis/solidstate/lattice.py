@@ -119,21 +119,23 @@ class Lattice(Cell):
     @classmethod
     def generate_sc(cls, alat, replica=(1,1,1), perturbation=False, delta=1e-8):
 
+        cell = alat * np.diag(np.full(3, replica))
         lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.sc_sites, 
                                                    replica, perturbation, delta)
-        return cls(cell = np.diag(np.full(3, alat)), lattice = lat_sites)
+        return cls(cell, lat_sites)
 
     @classmethod
     def generate_bcc(cls, alat, replica=(1,1,1), perturbation=False, delta=1e-8):
-
+        
+        cell = alat * np.diag(np.full(3, replica))
         lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.bcc_sites, 
                                                    replica, perturbation, delta)
-        return cls(cell = np.diag(np.full(3, alat)), lattice = lat_sites)
+        return cls(cell, lat_sites)
 
     @classmethod
     def generate_fcc(cls, alat, replica=(1,1,1), perturbation=False, delta=1e-8):
 
+        cell = alat * np.diag(np.full(3, replica))
         lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.fcc_sites, 
                                                    replica, perturbation, delta)
-        return cls(cell = np.diag(np.full(3, alat)), lattice = lat_sites)
-
+        return cls(cell, lat_sites)
