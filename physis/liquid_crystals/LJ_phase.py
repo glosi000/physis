@@ -185,8 +185,8 @@ class LJ:
         plt.show()
         s = sum(random_choice)
         return energy, acc*100./nstep, acc_add*100/s, acc_rej*100/(nstep-s)
+
     
-        
     def create_fcc_lattice(self):
       delta=0.00000001
       random_displacement_x = np.random.normal(0., delta, self.N)
