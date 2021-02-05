@@ -3,7 +3,7 @@
 """
 Created on Mon Jan 25 15:57:41 2021
 
-Classes and functions to work with lattices.
+Classes and functions to work with cells and lattices.
 
 @author: glosi000
 """
@@ -52,6 +52,18 @@ class Cell:
     def create_cube(cls, alat):
         return cls(cell = np.diag(np.full(3, alat)))
     
+    @property
+    def alat(self):
+        return np.linalg.norm(self.lattice[0, :])
+    
+    @property
+    def blat(self):
+        return np.linalg.norm(self.lattice[1, :])
+    
+    @property
+    def clat(self):
+        return np.linalg.norm(self.lattice[2, :])
+    
 
 class Lattice(Cell):
     """ Generate a crystalline lattice of points.
@@ -69,19 +81,6 @@ class Lattice(Cell):
     def __init__(self, cell, lattice):
         self.cell = cell
         self.lattice = lattice
-
-    @property
-    def latx(self):
-        return self.lattice[:, 0]
-    
-    @property
-    def laty(self):
-        return self.lattice[:, 1]
-    
-    @property
-    def latz(self):
-        return self.lattice[:, 2]
-
     
     def generate_cubic_lattice(alat, sites, replica=(1,1,1), 
                                perturbation=False, delta=1e-8):
