@@ -23,9 +23,44 @@ __date__ = 'January 26th, 2021'
 #from mpl_toolkits.mplot3d.art3d import Poly3DCollection, Line3DCollection
 from copy import copy 
 import numpy as np
+from physis.solidstate.lattice import Lattice
 import matplotlib.pyplot as plt
 
 colors={'P' : [[1,1,0]] , 'C' : [[0.7,0.7,0.7]]}
+
+class Crystal(Lattice):
+    """
+    Create a general crystal structure, made of a lattice cell and an
+    atomic basis.
+
+    """
+    
+    def __init__(self, cell, lattice, basis):
+        
+        Lattice.__init__(self, cell, lattice)
+        
+        self.cell = cell
+        self.lattice = lattice
+
+    def __init__(self, vectors, coords, basis, xyz =''):
+        
+        vectors = np.array(vectors , dtype=np.float64 )
+        coords  = np.array(coords  , dtype=np.float64 )
+        
+        if (self.__check_input(vectors, coords, basis)) == True : return
+        
+        basis   = np.array(basis   , dtype=np.str     )
+        
+        if xyz == '':
+            self.cell_vecs      = vectors.copy()
+            self.atoms_coords   = coords.copy()
+            self.atoms_name     = np.array(basis   , dtype=np.str).copy()
+            self.cell_angs      = np.zeros(3)
+            self.atoms_type     = len(set(basis))
+            
+            self.calculate_params()
+            self.__backup()
+
 
 class crystal:
     """ 
@@ -55,7 +90,6 @@ class crystal:
             self.calculate_params()
             self.__backup()
          
-    
     def replica(self, n=1, m=1, l=1):
         """ Replicate your cell n, m, l times along x, y, z 
         """
@@ -583,7 +617,6 @@ class crystal:
 #                at=np.vstack([at, rep-z])
 #                at=np.vstack([at, rep-y-z])
 #                self.atoms_name=np.append(self.atoms_name, [name_at]*3)
-#                
 #            
 #            #Now replicate for the upper atoms
 #            elif sum(rep - x - y - z) < 1e-17: #on origin
@@ -595,9 +628,6 @@ class crystal:
 #                at=np.vstack([at, rep-y-z])
 #                at=np.vstack([at, rep-x-y-z])
 #                self.atoms_name=np.append(self.atoms_name, [name_at]*7)
-#                
-#                
-#            
 #                
 #            else: #only one coordinate is zero
 #                if rep[0] < 1e-17: #(0,y,z)
@@ -621,8 +651,9 @@ class crystal:
 #        
 #        self.atoms_coords = at.copy()
         
+if __name__ == '__main__':
 
-a=crystal( [[1,0,0], [0,1,0], [0,0,1]], [[0, 0, 0], [0.5, 0.5, 0]] , ['P', 'C']  )
-a.info()
-a.plane(1,1,1)
+    a=crystal( [[1,0,0], [0,1,0], [0,0,1]], [[0, 0, 0], [0.5, 0.5, 0]] , ['P', 'C']  )
+    a.info()
+    a.plane(1,1,1)
 

@@ -3,7 +3,7 @@
 """
 Created on Mon Jan 25 15:57:41 2021
 
-Classes and functions to work with lattices.
+Classes to work with the basic definition of mathematical cells and lattices.
 
 @author: glosi000
 """
@@ -17,28 +17,9 @@ __email__ = "gabriele.losi@outlook.com"
 __status__ = "Prototype"
 __date__ = 'January 25th, 2021'
 
+
 import numpy as np
-
-
-class LatticeError(Exception):
-    """ General class for errors in crystal lattices
-    """
-    pass
-
-
-class InputLatticeError(LatticeError):
-    """ Manage input errors in building lattices
-    """
-
-    @staticmethod
-    def cubic(alat, replica):
-        # Check input parameters
-        if not isinstance(replica, (list, tuple, np.ndarray)):
-            raise InputLatticeError('Wrong type: replica')
-        if any(i <= 0 for i in replica):
-            raise InputLatticeError('Invalid Argument: replica')
-        if not isinstance(alat, (int, float)):
-            raise InputLatticeError('Wrong type: alat')
+from physis.utils.errors import InputLatticeError
 
 
 class Cell:
@@ -51,6 +32,18 @@ class Cell:
     @classmethod
     def create_cube(cls, alat):
         return cls(cell = np.diag(np.full(3, alat)))
+    
+    @property
+    def alat(self):
+        return np.linalg.norm(self.lattice[0, :])
+    
+    @property
+    def blat(self):
+        return np.linalg.norm(self.lattice[1, :])
+    
+    @property
+    def clat(self):
+        return np.linalg.norm(self.lattice[2, :])
     
 
 class Lattice(Cell):
@@ -69,19 +62,6 @@ class Lattice(Cell):
     def __init__(self, cell, lattice):
         self.cell = cell
         self.lattice = lattice
-
-    @property
-    def latx(self):
-        return self.lattice[:, 0]
-    
-    @property
-    def laty(self):
-        return self.lattice[:, 1]
-    
-    @property
-    def latz(self):
-        return self.lattice[:, 2]
-
     
     def generate_cubic_lattice(alat, sites, replica=(1,1,1), 
                                perturbation=False, delta=1e-8):
@@ -119,21 +99,23 @@ class Lattice(Cell):
     @classmethod
     def generate_sc(cls, alat, replica=(1,1,1), perturbation=False, delta=1e-8):
 
+        cell = alat * np.diag(np.full(3, replica))
         lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.sc_sites, 
                                                    replica, perturbation, delta)
-        return cls(cell = np.diag(np.full(3, alat)), lattice = lat_sites)
+        return cls(cell, lat_sites)
 
     @classmethod
     def generate_bcc(cls, alat, replica=(1,1,1), perturbation=False, delta=1e-8):
-
+        
+        cell = alat * np.diag(np.full(3, replica))
         lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.bcc_sites, 
                                                    replica, perturbation, delta)
-        return cls(cell = np.diag(np.full(3, alat)), lattice = lat_sites)
+        return cls(cell, lat_sites)
 
     @classmethod
     def generate_fcc(cls, alat, replica=(1,1,1), perturbation=False, delta=1e-8):
 
+        cell = alat * np.diag(np.full(3, replica))
         lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.fcc_sites, 
                                                    replica, perturbation, delta)
-        return cls(cell = np.diag(np.full(3, alat)), lattice = lat_sites)
-
+        return cls(cell, lat_sites)
