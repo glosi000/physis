@@ -4,7 +4,6 @@
 Created on Sun Apr  4 18:18:07 2021
 
 Custom errors for the physis package.
-
 @author: glosi000
 """
 

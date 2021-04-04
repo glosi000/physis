@@ -4,7 +4,6 @@
 Created on Mon Jan 25 15:57:41 2021
 
 Classes to work with the basic definition of mathematical cells and lattices.
-
 @author: glosi000
 """
 
@@ -63,7 +62,49 @@ class Lattice(Cell):
     def __init__(self, cell, sites=[0, 0, 0]):
         super().__init__(cell)
         self.sites = np.array(sites)
+
+    @classmethod
+    def generate_sc(cls, alat, replica=(1,1,1), perturb=None):
+
+        # Generate the cell and the lattice sites
+        cell, sites = Lattice.generate_cubic_lattice(alat, LatticeSites.sc,
+                                                     replica, perturb)
+        return cls(cell, sites)
+
+    @classmethod
+    def generate_bcc(cls, alat, replica=(1, 1, 1), perturb=None):
+
+        # Generate the cell and the lattice sites
+        cell, sites = Lattice.generate_cubic_lattice(alat, LatticeSites.bcc, 
+                                                     replica, perturb)
+        return cls(cell, sites)
+
+    @classmethod
+    def generate_fcc(cls, alat, replica=(1, 1, 1), perturb=None):
+        
+        # Generate the cell and the lattice sites
+        cell, lattice = Lattice.generate_cubic_lattice(alat, LatticeSites.fcc, 
+                                                       replica, perturb)
+        return cls(cell, lattice)
     
+    @staticmethod
+    def generate_cubic_lattice(alat, sites, replica=(1, 1, 1), perturb=None):
+        
+        # Search for fundamental errors in input arguments
+        InputLatticeError.cubic(alat, sites, replica, perturb)
+        
+        # Define the crystal cell and the lattice sites
+        cell = alat * np.diag(np.full(3, replica))
+        sites = alat * Lattice.build_sites(np.array(sites), replica)
+
+        # Insert perturbation
+        if perturb is not None:
+            N = np.prod(replica, dtype=int) * sites.shape[0]
+            sites += np.random.normal(0., perturb, size=(N, 3))
+        
+        return cell, sites
+
+    @staticmethod
     def build_sites(sites, replica=(1, 1, 1)):
 
         # Calculate the needed number of points preparing output array
@@ -81,43 +122,3 @@ class Lattice(Cell):
                     j += 4
 
         return lat_sites
-
-    @classmethod
-    def generate_sc(cls, alat, replica=(1,1,1), perturb=None):
-
-        # Generate the cell and the lattice sites
-        cell, sites = Lattice._generate_cube(alat, LatticeSites.sc, replica, perturb)
-        return cls(cell, sites)
-
-    @classmethod
-    def generate_bcc(cls, alat, replica=(1, 1, 1), perturb=None):
-
-        # Generate the cell and the lattice sites
-        cell, sites = Lattice._generate_cube(alat, LatticeSites.bcc, replica, perturb)
-        return cls(cell, sites)
-
-    @classmethod
-    def generate_fcc(cls, alat, replica=(1, 1, 1), perturb=None):
-        
-        # Generate the cell and the lattice sites
-        cell, lattice = Lattice._generate_cube(alat, LatticeSites.fcc, replica, perturb)
-        return cls(cell, lattice)
-
-    def _generate_cube(alat, sites, replica=(1, 1, 1), perturb=None):
-
-        # Search for fundamental errors in input arguments
-        InputLatticeError.cubic(alat, sites, replica, perturb)
-        
-        # Define the crystal cell and the lattice sites
-        cell = alat * np.diag(np.full(3, replica))
-        sites = np.array(sites)
-
-        # Build the lattice
-        lattice = alat * Lattice.build_sites(sites, replica)
-
-        # Insert perturbation
-        if perturb is not None:
-            N = np.prod(replica, dtype=int) * sites.shape[0]
-            lattice += np.random.normal(0., perturb, size=(N, 3))
-        
-        return cell, lattice
