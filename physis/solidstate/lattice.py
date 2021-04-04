@@ -3,7 +3,7 @@
 """
 Created on Mon Jan 25 15:57:41 2021
 
-Classes and functions to work with cells and lattices.
+Classes to work with the basic definition of mathematical cells and lattices.
 
 @author: glosi000
 """
@@ -17,28 +17,9 @@ __email__ = "gabriele.losi@outlook.com"
 __status__ = "Prototype"
 __date__ = 'January 25th, 2021'
 
+
 import numpy as np
-
-
-class LatticeError(Exception):
-    """ General class for errors in crystal lattices
-    """
-    pass
-
-
-class InputLatticeError(LatticeError):
-    """ Manage input errors in building lattices
-    """
-
-    @staticmethod
-    def cubic(alat, replica):
-        # Check input parameters
-        if not isinstance(replica, (list, tuple, np.ndarray)):
-            raise InputLatticeError('Wrong type: replica')
-        if any(i <= 0 for i in replica):
-            raise InputLatticeError('Invalid Argument: replica')
-        if not isinstance(alat, (int, float)):
-            raise InputLatticeError('Wrong type: alat')
+from physis.utils.errors import InputLatticeError
 
 
 class Cell:
