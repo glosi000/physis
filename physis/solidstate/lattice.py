@@ -35,15 +35,15 @@ class Cell:
     
     @property
     def alat(self):
-        return np.linalg.norm(self.lattice[0, :])
+        return np.linalg.norm(self.cell[0, :])
     
     @property
     def blat(self):
-        return np.linalg.norm(self.lattice[1, :])
+        return np.linalg.norm(self.cell[1, :])
     
     @property
     def clat(self):
-        return np.linalg.norm(self.lattice[2, :])
+        return np.linalg.norm(self.cell[2, :])
     
 
 class Lattice(Cell):
@@ -63,8 +63,7 @@ class Lattice(Cell):
         self.cell = cell
         self.lattice = lattice
     
-    def generate_cubic_lattice(alat, sites, replica=(1,1,1), 
-                               perturbation=False, delta=1e-8):
+    def generate_cubic_lattice(alat, sites, replica=(1, 1, 1), perturb=None):
 
         # Check inputs and get basic information
         InputLatticeError.cubic(alat, replica)
@@ -73,9 +72,9 @@ class Lattice(Cell):
         lat_sites = alat * Lattice.build_sites(sites, replica)
 
         # Insert perturbation
-        if perturbation:
+        if perturb is not None:
             N = np.prod(replica, dtype=int) * sites.shape[0]
-            lat_sites += np.random.normal(0., delta, size=(N, 3))
+            lat_sites += np.random.normal(0., perturb, size=(N, 3))
         
         return lat_sites
     
@@ -94,28 +93,29 @@ class Lattice(Cell):
                     # Calculate the repetition units for the lattice sites
                     lat_sites[j:j+4,:] = sites + np.array([n, m, l])
                     j += 4
+
         return lat_sites
 
     @classmethod
-    def generate_sc(cls, alat, replica=(1,1,1), perturbation=False, delta=1e-8):
+    def generate_sc(cls, alat, replica=(1,1,1), perturb=None):
 
         cell = alat * np.diag(np.full(3, replica))
         lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.sc_sites, 
-                                                   replica, perturbation, delta)
+                                                   replica, perturb)
         return cls(cell, lat_sites)
 
     @classmethod
-    def generate_bcc(cls, alat, replica=(1,1,1), perturbation=False, delta=1e-8):
+    def generate_bcc(cls, alat, replica=(1,1,1), perturb=None):
         
         cell = alat * np.diag(np.full(3, replica))
         lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.bcc_sites, 
-                                                   replica, perturbation, delta)
+                                                   replica, perturb)
         return cls(cell, lat_sites)
 
     @classmethod
-    def generate_fcc(cls, alat, replica=(1,1,1), perturbation=False, delta=1e-8):
+    def generate_fcc(cls, alat, replica=(1,1,1), perturb=None):
 
         cell = alat * np.diag(np.full(3, replica))
         lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.fcc_sites, 
-                                                   replica, perturbation, delta)
+                                                   replica, perturb)
         return cls(cell, lat_sites)
