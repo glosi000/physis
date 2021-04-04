@@ -44,20 +44,19 @@ class Cell:
     @property
     def clat(self):
         return np.linalg.norm(self.cell[2, :])
-    
 
-class Lattice(Cell):
-    """ Generate a crystalline lattice of points.
-    """
+
+class LatticeSites:
 
     # Conventional lattice sites
-    sc_sites  = np.array([0, 0, 0])
-    bcc_sites = np.array([[0, 0, 0],
-                          [0.5, 0.5, 0.5]])
-    fcc_sites = np.array([[0, 0, 0],
-                          [0.5, 0.5, 0],
-                          [0.5, 0, 0.5],
-                          [0, 0.5, 0.5]])
+    sc  = np.array([0, 0, 0])
+    bcc = np.array([[0, 0, 0], [0.5, 0.5, 0.5]])
+    fcc = np.array([[0, 0, 0], [0.5, 0.5, 0], [0.5, 0, 0.5], [0, 0.5, 0.5]])
+
+
+class Lattice(Cell, LatticeSites):
+    """ Generate a crystalline lattice of points.
+    """
     
     def __init__(self, cell, lattice):
         self.cell = cell
@@ -100,7 +99,7 @@ class Lattice(Cell):
     def generate_sc(cls, alat, replica=(1,1,1), perturb=None):
 
         cell = alat * np.diag(np.full(3, replica))
-        lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.sc_sites, 
+        lat_sites = Lattice.generate_cubic_lattice(alat, LatticeSites.sc, 
                                                    replica, perturb)
         return cls(cell, lat_sites)
 
@@ -108,7 +107,7 @@ class Lattice(Cell):
     def generate_bcc(cls, alat, replica=(1,1,1), perturb=None):
         
         cell = alat * np.diag(np.full(3, replica))
-        lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.bcc_sites, 
+        lat_sites = Lattice.generate_cubic_lattice(alat, LatticeSites.bcc, 
                                                    replica, perturb)
         return cls(cell, lat_sites)
 
@@ -116,6 +115,6 @@ class Lattice(Cell):
     def generate_fcc(cls, alat, replica=(1,1,1), perturb=None):
 
         cell = alat * np.diag(np.full(3, replica))
-        lat_sites = Lattice.generate_cubic_lattice(alat, Lattice.fcc_sites, 
+        lat_sites = Lattice.generate_cubic_lattice(alat, LatticeSites.fcc, 
                                                    replica, perturb)
         return cls(cell, lat_sites)
