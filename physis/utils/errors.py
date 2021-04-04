@@ -32,7 +32,7 @@ class InputLatticeError(LatticeError):
     """
 
     @staticmethod
-    def cubic(alat, sites, replica, primitive, perturb):
+    def cubic(alat, sites, replica, perturb):
 
         # Check alat
         if not isinstance(alat, (int, float)) or isinstance(alat, bool):
@@ -47,11 +47,7 @@ class InputLatticeError(LatticeError):
             raise InputLatticeError('Wrong type: replica. It should be array-like.')
         if any(i <= 0 for i in replica):
             raise InputLatticeError('Invalid Argument: replica. Elements '
-                                    'should be positive.')
-
-        # Check primitive
-        if not isinstance(primitive, bool):
-            raise InputLatticeError('Wrong type: primitive. It should be bool')            
+                                    'should be positive.')           
 
         # Check primitive
         if perturb is not None:

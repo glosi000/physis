@@ -47,39 +47,26 @@ class Cell:
 
 
 class LatticeSites:
+    """ Collection of primitive Bravais Lattices.
+    """
 
-    # Conventional lattice sites
+    # Cubic lattice sites
     sc  = np.array([0, 0, 0])
     bcc = np.array([[0, 0, 0], [0.5, 0.5, 0.5]])
     fcc = np.array([[0, 0, 0], [0.5, 0.5, 0], [0.5, 0, 0.5], [0, 0.5, 0.5]])
 
 
-class Lattice(Cell, LatticeSites):
+class Lattice(Cell):
     """ Generate a crystalline lattice of points.
     """
     
-    def __init__(self, cell, lattice):
-        self.cell = cell
-        self.lattice = lattice
-    
-    def generate_cubic_lattice(alat, sites, replica=(1, 1, 1), perturb=None):
-
-        # Check inputs and get basic information
-        InputLatticeError.cubic(alat, replica)
-
-        # Build the lattice
-        lat_sites = alat * Lattice.build_sites(sites, replica)
-
-        # Insert perturbation
-        if perturb is not None:
-            N = np.prod(replica, dtype=int) * sites.shape[0]
-            lat_sites += np.random.normal(0., perturb, size=(N, 3))
-        
-        return lat_sites
+    def __init__(self, cell, sites=[0, 0, 0]):
+        super().__init__(cell)
+        self.sites = np.array(sites)
     
     def build_sites(sites, replica=(1, 1, 1)):
 
-        # Calculate the needed number of points and prepare output array
+        # Calculate the needed number of points preparing output array
         N = np.prod(np.array(replica), dtype=int) * sites.shape[0]
         lat_sites = np.zeros(shape=(N, 3))
 
@@ -98,23 +85,39 @@ class Lattice(Cell, LatticeSites):
     @classmethod
     def generate_sc(cls, alat, replica=(1,1,1), perturb=None):
 
-        cell = alat * np.diag(np.full(3, replica))
-        lat_sites = Lattice.generate_cubic_lattice(alat, LatticeSites.sc, 
-                                                   replica, perturb)
-        return cls(cell, lat_sites)
+        # Generate the cell and the lattice sites
+        cell, sites = Lattice._generate_cube(alat, LatticeSites.sc, replica, perturb)
+        return cls(cell, sites)
 
     @classmethod
-    def generate_bcc(cls, alat, replica=(1,1,1), perturb=None):
+    def generate_bcc(cls, alat, replica=(1, 1, 1), perturb=None):
+
+        # Generate the cell and the lattice sites
+        cell, sites = Lattice._generate_cube(alat, LatticeSites.bcc, replica, perturb)
+        return cls(cell, sites)
+
+    @classmethod
+    def generate_fcc(cls, alat, replica=(1, 1, 1), perturb=None):
         
-        cell = alat * np.diag(np.full(3, replica))
-        lat_sites = Lattice.generate_cubic_lattice(alat, LatticeSites.bcc, 
-                                                   replica, perturb)
-        return cls(cell, lat_sites)
+        # Generate the cell and the lattice sites
+        cell, lattice = Lattice._generate_cube(alat, LatticeSites.fcc, replica, perturb)
+        return cls(cell, lattice)
 
-    @classmethod
-    def generate_fcc(cls, alat, replica=(1,1,1), perturb=None):
+    def _generate_cube(alat, sites, replica=(1, 1, 1), perturb=None):
 
+        # Search for fundamental errors in input arguments
+        InputLatticeError.cubic(alat, sites, replica, perturb)
+        
+        # Define the crystal cell and the lattice sites
         cell = alat * np.diag(np.full(3, replica))
-        lat_sites = Lattice.generate_cubic_lattice(alat, LatticeSites.fcc, 
-                                                   replica, perturb)
-        return cls(cell, lat_sites)
+        sites = np.array(sites)
+
+        # Build the lattice
+        lattice = alat * Lattice.build_sites(sites, replica)
+
+        # Insert perturbation
+        if perturb is not None:
+            N = np.prod(replica, dtype=int) * sites.shape[0]
+            lattice += np.random.normal(0., perturb, size=(N, 3))
+        
+        return cell, lattice
