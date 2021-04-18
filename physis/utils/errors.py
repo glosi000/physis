@@ -53,3 +53,25 @@ class InputLatticeError(LatticeError):
             if not isinstance(perturb, (int, float)):
                 raise InputLatticeError('Wrong type: perturb. It should be '
                                         'int or float when not None.')
+
+class CrystalError(Exception):
+    """ General custom error for crystal generation
+    """
+    pass
+
+class InputCrystalError(CrystalError):
+    """ Handle input errors within the constructor method of Crystal class
+    """
+
+    @staticmethod
+    def atomic_basis(atoms, basis):
+        
+        # If `atoms` is provided, the number of givent elements should be the
+        # same of the rows of the basis matrix
+        if atoms is not None:
+            lbasis = 1 if basis is None else basis.shape[0]
+            if len(atoms) != lbasis:
+                raise InputCrystalError('Invalid input arguments for atoms or '
+                                        'basis. If atoms is not None, it must be '
+                                        'len(atoms) equal to basis.shape[0], '
+                                        'or 1 if basis is None')
