@@ -48,8 +48,8 @@ class InputLatticeError(LatticeError):
             raise InputLatticeError('Invalid Argument: replica. Elements '
                                     'should be positive.')           
 
-        # Check primitive
+        # Check perturb
         if perturb is not None:
-            if not isinstance(primitive, (int, float)):
+            if not isinstance(perturb, (int, float)):
                 raise InputLatticeError('Wrong type: perturb. It should be '
                                         'int or float when not None.')
