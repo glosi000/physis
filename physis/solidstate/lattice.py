@@ -50,7 +50,7 @@ class LatticeSites:
     """
 
     # Cubic lattice sites
-    sc  = np.array([0, 0, 0])
+    sc  = np.array([[0, 0, 0]])
     bcc = np.array([[0, 0, 0], [0.5, 0.5, 0.5]])
     fcc = np.array([[0, 0, 0], [0.5, 0.5, 0], [0.5, 0, 0.5], [0, 0.5, 0.5]])
 
