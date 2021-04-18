@@ -65,12 +65,24 @@ class InputCrystalError(CrystalError):
 
     @staticmethod
     def atomic_basis(atoms, basis):
-        
-        # If `atoms` is provided, the number of givent elements should be the
-        # same of the rows of the basis matrix
+
+        # Check basis argument and type
+        if basis is not None:
+            if not isinstance(basis, (list, np.ndarray, np.matrix)):
+                raise InputCrystalError('Wrong type: basis. It should be list, '
+                                        'np.ndarray, np.matrix or None')
+
+        # Check atoms argument
         if atoms is not None:
-            lbasis = 1 if basis is None else basis.shape[0]
-            if len(atoms) != lbasis:
+            # Check atoms type
+            if not isinstance(atoms, (list, np.ndarray)):
+                raise InputCrystalError('Wrong type: atoms. It should be list, '
+                                        'np.ndarray or None')
+
+            # Check atoms shape compared to basis. If atoms is provided, the 
+            # number of elements must be the same of the rows of basis
+            lbasis = 1 if basis is None else np.array(basis).shape[0]
+            if len(np.array(atoms)) != lbasis:
                 raise InputCrystalError('Invalid input arguments for atoms or '
                                         'basis. If atoms is not None, it must be '
                                         'len(atoms) equal to basis.shape[0], '
